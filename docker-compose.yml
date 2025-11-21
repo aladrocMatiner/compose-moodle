@@ -70,7 +70,7 @@ services:
     container_name: moodle-install
     env_file: .env
     working_dir: /var/www/html
-    command: /bin/sh -c "set -e; if [ -f /var/www/html/config.php ]; then echo 'Moodle already installed, skipping.'; exit 0; fi; sleep 10; php admin/cli/install.php --non-interactive --agree-license --lang=en --wwwroot=https://learn.golum.io --dataroot=/bitnami/moodledata --dbtype=pgsql --dbhost=postgres --dbport=5432 --dbname=${MOODLE_DB_NAME} --dbuser=${MOODLE_DB_USER} --dbpass=${MOODLE_DB_PASSWORD} --fullname=\"${MOODLE_SITE_NAME}\" --shortname=\"Golum\" --adminuser=${MOODLE_ADMIN_USER} --adminpass=${MOODLE_ADMIN_PASSWORD} --adminemail=${MOODLE_ADMIN_EMAIL}; chown -R www-data:www-data /var/www/html /bitnami/moodledata"
+    command: /bin/sh -c "set -e; if [ -f /var/www/html/config.php ]; then echo 'Moodle already installed, skipping.'; exit 0; fi; sleep 10; php admin/cli/install.php --non-interactive --agree-license --lang=en --wwwroot=https://learn.golum.io --dataroot=/bitnami/moodledata --dbtype=pgsql --dbhost=postgres --dbport=5432 --dbname=${MOODLE_DB_NAME} --dbuser=${MOODLE_DB_USER} --dbpass=${MOODLE_DB_PASSWORD} --fullname=\"${MOODLE_SITE_NAME}\" --shortname=\"Golum\" --adminuser=${MOODLE_ADMIN_USER} --adminpass=${MOODLE_ADMIN_PASSWORD} --adminemail=${MOODLE_ADMIN_EMAIL}; sed -i \"s/\\\$CFG->directorypermissions = 02777;/\\\$CFG->directorypermissions = 02777;\\n\\\$CFG->sslproxy = true;/\" /var/www/html/config.php; chown -R www-data:www-data /var/www/html /bitnami/moodledata"
     depends_on:
       postgres:
         condition: service_started
