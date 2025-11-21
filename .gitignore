@@ -1,0 +1,10 @@
+.env
+.DS_Store
+certs/ca/*
+certs/live/*
+!certs/ca/.gitkeep
+!certs/live/.gitkeep
+postgres_data/
+moodledata/
+grafana_data/
+prometheus_data/

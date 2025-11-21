@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: "HA Moodle Dashboards"
+    orgId: 1
+    folder: "HA Moodle"
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards
