@@ -20,6 +20,11 @@ services:
   varnish:
     image: varnish:7.4
     container_name: varnish
+    depends_on:
+      moodle1:
+        condition: service_started
+      moodle2:
+        condition: service_started
     volumes:
       - ./config/varnish/default.vcl:/etc/varnish/default.vcl:ro
     command:
@@ -41,7 +46,7 @@ services:
     image: alpine:3
     container_name: moodle-code
     environment:
-      - MOODLE_GIT_BRANCH=${MOODLE_GIT_BRANCH:-MOODLE_404_STABLE}
+      - MOODLE_GIT_BRANCH=${MOODLE_GIT_BRANCH:-MOODLE_501_STABLE}
     command:
       - /bin/sh
       - -c
@@ -49,13 +54,31 @@ services:
         set -e
         apk add --no-cache git
         if [ ! -f /var/www/html/index.php ]; then
-          git clone --depth 1 -b "${MOODLE_GIT_BRANCH}" https://github.com/moodle/moodle.git /var/www/html && \
+          git clone --depth 1 -b "${MOODLE_GIT_BRANCH}" https://github.com/moodle/moodle.git /var/www/html
           chown -R 33:33 /var/www/html
         else
           echo "Moodle code already present; skipping clone."
         fi
     volumes:
       - moodle_code:/var/www/html
+    networks:
+      - golum
+    restart: "no"
+
+  moodle-install:
+    image: ${MOODLE_IMAGE:-moodlehq/moodle-php-apache:8.3-bookworm}
+    container_name: moodle-install
+    env_file: .env
+    working_dir: /var/www/html
+    command: /bin/sh -c "set -e; if [ -f /var/www/html/config.php ]; then echo 'Moodle already installed, skipping.'; exit 0; fi; sleep 10; php admin/cli/install.php --non-interactive --agree-license --lang=en --wwwroot=https://learn.golum.io --dataroot=/bitnami/moodledata --dbtype=pgsql --dbhost=postgres --dbport=5432 --dbname=${MOODLE_DB_NAME} --dbuser=${MOODLE_DB_USER} --dbpass=${MOODLE_DB_PASSWORD} --fullname=\"${MOODLE_SITE_NAME}\" --shortname=\"Golum\" --adminuser=${MOODLE_ADMIN_USER} --adminpass=${MOODLE_ADMIN_PASSWORD} --adminemail=${MOODLE_ADMIN_EMAIL}; chown -R www-data:www-data /var/www/html /bitnami/moodledata"
+    depends_on:
+      postgres:
+        condition: service_started
+      moodle-code:
+        condition: service_completed_successfully
+    volumes:
+      - moodle_code:/var/www/html
+      - moodledata:/bitnami/moodledata
     networks:
       - golum
     restart: "no"
@@ -138,11 +161,15 @@ services:
     restart: unless-stopped
 
   moodle1:
-    image: moodlehq/moodle-php-apache:8.4-bookworm
+    image: ${MOODLE_IMAGE:-moodlehq/moodle-php-apache:8.3-bookworm}
     container_name: moodle1
     depends_on:
-      - moodle-code
-      - postgres
+      moodle-code:
+        condition: service_completed_successfully
+      moodle-install:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_started
     env_file: .env
     environment:
       - MOODLE_DATABASE_TYPE=pgsql
@@ -170,11 +197,15 @@ services:
     restart: unless-stopped
 
   moodle2:
-    image: moodlehq/moodle-php-apache:8.4-bookworm
+    image: ${MOODLE_IMAGE:-moodlehq/moodle-php-apache:8.3-bookworm}
     container_name: moodle2
     depends_on:
-      - moodle-code
-      - postgres
+      moodle-code:
+        condition: service_completed_successfully
+      moodle-install:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_started
     env_file: .env
     environment:
       - MOODLE_DATABASE_TYPE=pgsql

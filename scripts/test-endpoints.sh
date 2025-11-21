@@ -23,7 +23,7 @@ check_url() {
     "${CURL_INSECURE_FLAGS[@]}" \
     "${url}" || true)
 
-  if [[ "${status}" == "200" || "${status}" == "301" || "${status}" == "302" ]]; then
+  if [[ "${status}" == "200" || "${status}" == "301" || "${status}" == "302" || "${status}" == "303" ]]; then
     echo "OK (HTTP ${status})"
     return 0
   fi

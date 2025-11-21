@@ -21,7 +21,6 @@ sub vcl_init {
 acl purge {
     "localhost";
     "127.0.0.1";
-    "haproxy";
 }
 
 sub vcl_recv {
