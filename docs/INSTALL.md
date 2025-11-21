@@ -10,6 +10,12 @@ This project provides a local HA-style Moodle stack with HAProxy → Varnish →
 ## 1) Configure environment
 1. Copy `.env.example` to `.env` and adjust secrets as needed (DB passwords, Moodle admin, Keycloak admin, Grafana admin).
 2. Keep `MOODLE_REVERSEPROXY` and `MOODLE_SSLPROXY` enabled (already set in the compose file).
+3. If host ports 80/443 are in use, override HAProxy host bindings in `.env` (or env vars):
+   ```
+   HAPROXY_HTTP_PORT=8081
+   HAPROXY_HTTPS_PORT=8443
+   ```
+   And use matching URLs with ports when testing (e.g., `https://learn.golum.io:8443`).
 
 ## 2) Generate and trust TLS certificates
 1. Generate a local CA and leaf certs for `learn.golum.io`, `sso.golum.io`, and `grafana.golum.io`:
@@ -49,6 +55,20 @@ docker compose ps
 ## 6) Stopping and cleanup
 - Stop the stack: `docker compose down`
 - Remove volumes (destructive): `docker compose down -v`
+
+## 7) Endpoint smoke tests
+After the stack is up, run the helper to check all three HTTPS endpoints:
+```bash
+./scripts/test-endpoints.sh
+# If your CA is not trusted yet and you expect warnings, allow -k:
+# ALLOW_INSECURE=1 ./scripts/test-endpoints.sh
+# If you changed HAProxy host ports, override the URLs, e.g.:
+# LEARN_HOST=https://learn.golum.io:8443 \
+# SSO_HOST=https://sso.golum.io:8443 \
+# GRAFANA_HOST=https://grafana.golum.io:8443 \
+# ALLOW_INSECURE=1 ./scripts/test-endpoints.sh
+```
+The script exits non-zero if any endpoint returns a non-200/301/302 status.
 
 ## Notes
 - The HAProxy config expects certificates at `certs/live/*.pem`; regenerate if hostnames change.
