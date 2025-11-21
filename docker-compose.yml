@@ -37,6 +37,29 @@ services:
       - golum
     restart: unless-stopped
 
+  moodle-code:
+    image: alpine:3
+    container_name: moodle-code
+    environment:
+      - MOODLE_GIT_BRANCH=${MOODLE_GIT_BRANCH:-MOODLE_404_STABLE}
+    command:
+      - /bin/sh
+      - -c
+      - |
+        set -e
+        apk add --no-cache git
+        if [ ! -f /var/www/html/index.php ]; then
+          git clone --depth 1 -b "${MOODLE_GIT_BRANCH}" https://github.com/moodle/moodle.git /var/www/html && \
+          chown -R 33:33 /var/www/html
+        else
+          echo "Moodle code already present; skipping clone."
+        fi
+    volumes:
+      - moodle_code:/var/www/html
+    networks:
+      - golum
+    restart: "no"
+
   postgres:
     image: postgres:15
     container_name: postgres
@@ -117,6 +140,9 @@ services:
   moodle1:
     image: moodlehq/moodle-php-apache:8.4-bookworm
     container_name: moodle1
+    depends_on:
+      - moodle-code
+      - postgres
     env_file: .env
     environment:
       - MOODLE_DATABASE_TYPE=pgsql
@@ -137,9 +163,8 @@ services:
       - PHP_POST_MAX_SIZE=100M
       - TZ=${TZ}
     volumes:
+      - moodle_code:/var/www/html
       - moodledata:/bitnami/moodledata
-    depends_on:
-      - postgres
     networks:
       - golum
     restart: unless-stopped
@@ -147,6 +172,9 @@ services:
   moodle2:
     image: moodlehq/moodle-php-apache:8.4-bookworm
     container_name: moodle2
+    depends_on:
+      - moodle-code
+      - postgres
     env_file: .env
     environment:
       - MOODLE_DATABASE_TYPE=pgsql
@@ -167,9 +195,8 @@ services:
       - PHP_POST_MAX_SIZE=100M
       - TZ=${TZ}
     volumes:
+      - moodle_code:/var/www/html
       - moodledata:/bitnami/moodledata
-    depends_on:
-      - postgres
     networks:
       - golum
     restart: unless-stopped
@@ -207,6 +234,7 @@ services:
 volumes:
   postgres_data:
   moodledata:
+  moodle_code:
   grafana_data:
   prometheus_data:
   keycloak_data:

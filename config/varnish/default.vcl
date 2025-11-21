@@ -1,8 +1,21 @@
 vcl 4.1;
 
-backend default {
+import directors;
+
+backend moodle1 {
     .host = "moodle1";
     .port = "80";
+}
+
+backend moodle2 {
+    .host = "moodle2";
+    .port = "80";
+}
+
+sub vcl_init {
+    new lb = directors.round_robin();
+    lb.add_backend(moodle1);
+    lb.add_backend(moodle2);
 }
 
 acl purge {
@@ -18,6 +31,8 @@ sub vcl_recv {
     if (req.method == "PURGE") {
         return (purge);
     }
+
+    set req.backend_hint = lb.backend();
 
     if (req.method != "GET" && req.method != "HEAD") {
         return (pass);
