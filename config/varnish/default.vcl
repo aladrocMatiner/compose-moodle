@@ -1,8 +1,8 @@
 vcl 4.1;
 
 backend default {
-    .host = "haproxy";
-    .port = "8080";
+    .host = "moodle1";
+    .port = "80";
 }
 
 acl purge {
@@ -19,7 +19,6 @@ sub vcl_recv {
         return (purge);
     }
 
-sub vcl_recv {
     if (req.method != "GET" && req.method != "HEAD") {
         return (pass);
     }

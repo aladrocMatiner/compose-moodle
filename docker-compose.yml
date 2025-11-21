@@ -188,7 +188,9 @@ services:
       - KC_DB_USERNAME=${KEYCLOAK_DB_USER}
       - KC_DB_PASSWORD=${KEYCLOAK_DB_PASSWORD}
       - KC_PROXY=edge
-      - KC_HOSTNAME=sso.golum.io
+      - KC_HOSTNAME_URL=https://sso.golum.io
+      - KC_HOSTNAME_ADMIN_URL=https://sso.golum.io/admin
+      - KC_PROXY_HEADERS=xforwarded
       - TZ=${TZ}
     command:
       - start-dev
