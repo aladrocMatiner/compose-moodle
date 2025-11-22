@@ -20,10 +20,23 @@ $baseurl = "https://sso.golum.io/realms/{$realm}";
 $now = time();
 $admin = get_admin();
 
-// Ensure issuer record exists.
+// Ensure issuer record exists and is up to date.
 $existing = $DB->get_record('oauth2_issuer', ['name' => 'Keycloak']);
 if ($existing) {
-    $issuerid = $existing->id;
+    $issuer = $existing;
+    $issuer->timemodified = $now;
+    $issuer->usermodified = $admin->id;
+    $issuer->image = $baseurl;
+    $issuer->baseurl = $baseurl;
+    $issuer->clientid = $clientid;
+    $issuer->clientsecret = $clientsecret;
+    $issuer->loginscopes = 'openid profile email';
+    // Include offline_access so system accounts can upgrade tokens.
+    $issuer->loginscopesoffline = 'openid profile email offline_access';
+    $issuer->showonloginpage = issuer::EVERYWHERE;
+    $issuer->loginpagename = 'Keycloak';
+    $DB->update_record('oauth2_issuer', $issuer);
+    $issuerid = $issuer->id;
 } else {
     $issuer = new stdClass();
     $issuer->timecreated = $now;
@@ -35,7 +48,7 @@ if ($existing) {
     $issuer->clientid = $clientid;
     $issuer->clientsecret = $clientsecret;
     $issuer->loginscopes = 'openid profile email';
-    $issuer->loginscopesoffline = 'openid profile email';
+    $issuer->loginscopesoffline = 'openid profile email offline_access';
     $issuer->loginparams = '';
     $issuer->loginparamsoffline = '';
     $issuer->alloweddomains = '';
@@ -85,4 +98,40 @@ if (!in_array('oauth2', $authplugins, true)) {
     set_config('auth', implode(',', $authplugins));
 }
 
-echo "Ensured Keycloak OAuth2 issuer (id {$issuerid}), endpoints and OAuth2 auth plugin are configured.\n";
+// Relax cURL security so outbound calls to sso.golum.io (10.x) are not blocked.
+$blocked = get_config('core', 'curlsecurityblockedhosts');
+if (!empty($blocked)) {
+    $lines = array_filter(array_map('trim', explode("\n", $blocked)));
+    $lines = array_values(array_filter($lines, static function(string $line): bool {
+        return $line !== '10.0.0.0/8';
+    }));
+    set_config('curlsecurityblockedhosts', implode("\n", $lines));
+}
+
+// Ensure default user field mappings exist for this issuer.
+$DB->delete_records('oauth2_user_field_mapping', ['issuerid' => $issuerid]);
+
+$mapping = [
+    'given_name'   => 'firstname',
+    'middle_name'  => 'middlename',
+    'family_name'  => 'lastname',
+    'email'        => 'email',
+    'nickname'     => 'alternatename',
+    'picture'      => 'picture',
+    'address'      => 'address',
+    'phone'        => 'phone1',
+    'locale'       => 'lang',
+];
+
+foreach ($mapping as $external => $internal) {
+    $record = new stdClass();
+    $record->timecreated = $now;
+    $record->timemodified = $now;
+    $record->usermodified = $admin->id;
+    $record->issuerid = $issuerid;
+    $record->externalfield = $external;
+    $record->internalfield = $internal;
+    $DB->insert_record('oauth2_user_field_mapping', $record);
+}
+
+echo "Ensured Keycloak OAuth2 issuer (id {$issuerid}), endpoints, OAuth2 auth plugin, cURL security and user field mappings are configured.\n";
