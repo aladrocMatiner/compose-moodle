@@ -4,12 +4,25 @@
 - **Prometheus**: scrapes metrics from:
   - `prom-node-exporter` (host/container metrics)
   - `postgres-exporter` (PostgreSQL metrics)
-- **Grafana**: pre-provisioned with a Prometheus data source and a starter dashboard at `HA Moodle/HA Moodle Overview`.
+- **Loki + promtail**: collect container logs from all services in the stack.
+- **Grafana**: pre-provisioned with:
+  - a Prometheus data source
+  - a Loki data source for logs
+  - a starter dashboard at `HA Moodle/HA Moodle Overview`.
 
 ## Access
 - URL: `https://grafana.golum.io`
 - Credentials: `GRAFANA_ADMIN_USER` / `GRAFANA_ADMIN_PASSWORD` from `.env`
-- Data source: Prometheus at `http://prometheus:9090` (pre-provisioned in `config/grafana/provisioning/datasources/datasource.yml`).
+- Data sources:
+  - Prometheus at `http://prometheus:9090` (pre-provisioned in `config/grafana/provisioning/datasources/datasource.yml`).
+  - Loki at `http://loki:3100` (pre-provisioned in `config/grafana/provisioning/datasources/loki.yml`).
+
+### Logs in Grafana (Loki)
+- Open `Explore` in Grafana and select the `Loki` data source.
+- Use the `service` or `container` labels to filter logs, for example:
+  - `{service="haproxy"}`
+  - `{service="moodle1"}` or `{service="moodle2"}`
+  - `{service="keycloak"}` or `{service="postgres"}`
 
 ## Dashboards
 - Starter dashboard: `HA Moodle Overview` (from `config/grafana/dashboards/ha-overview.json`)
