@@ -71,6 +71,8 @@ services:
     env_file: .env
     working_dir: /var/www/html
     command: /usr/local/bin/install-and-configure-moodle.sh
+    environment:
+      - CURL_CA_BUNDLE=/usr/local/share/ca-certificates/golum-local-ca.crt
     depends_on:
       postgres:
         condition: service_started
@@ -81,6 +83,7 @@ services:
       - moodledata:/bitnami/moodledata
       - ./docker/moodle/install-and-configure.sh:/usr/local/bin/install-and-configure-moodle.sh:ro
       - ./docker/moodle/configure-keycloak-oauth2.php:/usr/local/bin/configure-keycloak-oauth2.php:ro
+      - ./certs/ca/golum-local-ca.crt:/usr/local/share/ca-certificates/golum-local-ca.crt:ro
     networks:
       - golum
     restart: "no"
@@ -191,9 +194,11 @@ services:
       - PHP_UPLOAD_MAX_FILESIZE=100M
       - PHP_POST_MAX_SIZE=100M
       - TZ=${TZ}
+      - CURL_CA_BUNDLE=/usr/local/share/ca-certificates/golum-local-ca.crt
     volumes:
       - moodle_code:/var/www/html
       - moodledata:/bitnami/moodledata
+      - ./certs/ca/golum-local-ca.crt:/usr/local/share/ca-certificates/golum-local-ca.crt:ro
     networks:
       - golum
     restart: unless-stopped
@@ -227,9 +232,11 @@ services:
       - PHP_UPLOAD_MAX_FILESIZE=100M
       - PHP_POST_MAX_SIZE=100M
       - TZ=${TZ}
+      - CURL_CA_BUNDLE=/usr/local/share/ca-certificates/golum-local-ca.crt
     volumes:
       - moodle_code:/var/www/html
       - moodledata:/bitnami/moodledata
+      - ./certs/ca/golum-local-ca.crt:/usr/local/share/ca-certificates/golum-local-ca.crt:ro
     networks:
       - golum
     restart: unless-stopped
