@@ -80,6 +80,7 @@ services:
       - moodle_code:/var/www/html
       - moodledata:/bitnami/moodledata
       - ./docker/moodle/install-and-configure.sh:/usr/local/bin/install-and-configure-moodle.sh:ro
+      - ./docker/moodle/configure-keycloak-oauth2.php:/usr/local/bin/configure-keycloak-oauth2.php:ro
     networks:
       - golum
     restart: "no"
@@ -255,8 +256,10 @@ services:
       - start-dev
       - --hostname-strict=false
       - --http-enabled=true
+      - --import-realm
     volumes:
       - keycloak_data:/opt/keycloak/data
+      - ./config/keycloak/moodle-realm.json:/opt/keycloak/data/import/moodle-realm.json:ro
     depends_on:
       - postgres
     networks:

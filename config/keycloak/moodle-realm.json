@@ -1,0 +1,44 @@
+{
+  "id": "moodle",
+  "realm": "moodle",
+  "enabled": true,
+  "displayName": "Moodle SSO Realm",
+  "loginWithEmailAllowed": true,
+  "registrationAllowed": false,
+  "sslRequired": "external",
+  "clients": [
+    {
+      "clientId": "moodle",
+      "name": "Moodle",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "moodle-client-secret",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "https://learn.golum.io/*"
+      ],
+      "webOrigins": [
+        "https://learn.golum.io"
+      ],
+      "baseUrl": "https://learn.golum.io",
+      "rootUrl": "https://learn.golum.io",
+      "defaultClientScopes": [
+        "web-origins",
+        "role_list",
+        "roles",
+        "profile",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
+    }
+  ]
+}
+

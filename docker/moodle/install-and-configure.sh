@@ -26,6 +26,12 @@ if [ -f config.php ]; then
   else
     sed -i "s~require_once(__DIR__ . '/lib/setup.php');~\$CFG->sslproxy = true;\n\$CFG->dbsessions = 1;\n\nrequire_once(__DIR__ . '/lib/setup.php');~" config.php
   fi
+
+  # Configure Moodle OAuth2 issuer for Keycloak (idempotent).
+  if [ -f /usr/local/bin/configure-keycloak-oauth2.php ]; then
+    echo "Configuring Moodle OAuth2 issuer for Keycloak..."
+    php /usr/local/bin/configure-keycloak-oauth2.php || echo "Keycloak OAuth2 configuration failed (continuing)."
+  fi
 fi
 
 chown -R www-data:www-data /var/www/html /bitnami/moodledata
