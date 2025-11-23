@@ -13,6 +13,7 @@
 - [x] 2.5 Configure the Keycloak base URL to serve SSO at `https://sso.golum.io` (including any reverse proxy or TLS settings needed for local use).
 - [x] 2.6 Configure Moodle to use Keycloak as its SSO/identity provider (e.g., OpenID Connect or OAuth2 plugin) using the values from 2.4.
 - [x] 2.7 Define a single local certificate authority (CA) and use it to generate leaf certificates for `learn.golum.io`, `sso.golum.io`, and `grafana.golum.io`, and mount the resulting keys and certificates into the relevant services.
+- [x] 2.8 Style the Moodle Keycloak SSO login button with a clear label and icon so users can easily see the “Login with Keycloak” option on the Moodle login page.
 
 ## 3. Monitoring and Grafana
 - [x] 3.1 Add Grafana service to the Compose stack.
