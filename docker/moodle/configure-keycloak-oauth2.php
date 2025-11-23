@@ -26,7 +26,8 @@ if ($existing) {
     $issuer = $existing;
     $issuer->timemodified = $now;
     $issuer->usermodified = $admin->id;
-    $issuer->image = $baseurl;
+    // Use a nicer Keycloak icon for the login button.
+    $issuer->image = 'https://www.keycloak.org/resources/images/keycloak_icon_512px.svg';
     $issuer->baseurl = $baseurl;
     $issuer->clientid = $clientid;
     $issuer->clientsecret = $clientsecret;
@@ -34,7 +35,7 @@ if ($existing) {
     // Include offline_access so system accounts can upgrade tokens.
     $issuer->loginscopesoffline = 'openid profile email offline_access';
     $issuer->showonloginpage = issuer::EVERYWHERE;
-    $issuer->loginpagename = 'Keycloak';
+    $issuer->loginpagename = 'Login with Keycloak';
     $DB->update_record('oauth2_issuer', $issuer);
     $issuerid = $issuer->id;
 } else {
@@ -43,7 +44,8 @@ if ($existing) {
     $issuer->timemodified = $now;
     $issuer->usermodified = $admin->id;
     $issuer->name = 'Keycloak';
-    $issuer->image = $baseurl;
+    // Use a nicer Keycloak icon for the login button.
+    $issuer->image = 'https://www.keycloak.org/resources/images/keycloak_icon_512px.svg';
     $issuer->baseurl = $baseurl;
     $issuer->clientid = $clientid;
     $issuer->clientsecret = $clientsecret;
@@ -59,7 +61,7 @@ if ($existing) {
     $issuer->sortorder = 0;
     $issuer->requireconfirmation = 1;
     $issuer->servicetype = null;
-    $issuer->loginpagename = 'Keycloak';
+    $issuer->loginpagename = 'Login with Keycloak';
     $issuer->systememail = null;
 
     $issuerid = $DB->insert_record('oauth2_issuer', $issuer);
