@@ -7,7 +7,7 @@ require_once('/var/www/html/config.php');
 
 use core\oauth2\issuer;
 
-global $DB;
+global $DB, $CFG;
 
 $realm = getenv('KEYCLOAK_REALM') ?: 'moodle';
 
@@ -26,8 +26,8 @@ if ($existing) {
     $issuer = $existing;
     $issuer->timemodified = $now;
     $issuer->usermodified = $admin->id;
-    // Use a nicer Keycloak icon for the login button.
-    $issuer->image = 'https://www.keycloak.org/resources/images/keycloak_icon_512px.svg';
+    // Use a nicer Keycloak icon for the login button, served locally.
+    $issuer->image = $CFG->wwwroot . '/local/keycloak/keycloak-icon.svg';
     $issuer->baseurl = $baseurl;
     $issuer->clientid = $clientid;
     $issuer->clientsecret = $clientsecret;
@@ -44,8 +44,8 @@ if ($existing) {
     $issuer->timemodified = $now;
     $issuer->usermodified = $admin->id;
     $issuer->name = 'Keycloak';
-    // Use a nicer Keycloak icon for the login button.
-    $issuer->image = 'https://www.keycloak.org/resources/images/keycloak_icon_512px.svg';
+    // Use a nicer Keycloak icon for the login button, served locally.
+    $issuer->image = $CFG->wwwroot . '/local/keycloak/keycloak-icon.svg';
     $issuer->baseurl = $baseurl;
     $issuer->clientid = $clientid;
     $issuer->clientsecret = $clientsecret;

@@ -199,6 +199,7 @@ services:
       - moodle_code:/var/www/html
       - moodledata:/bitnami/moodledata
       - ./certs/ca/golum-local-ca.crt:/usr/local/share/ca-certificates/golum-local-ca.crt:ro
+      - ./docker/moodle/keycloak-icon.svg:/var/www/html/public/local/keycloak/keycloak-icon.svg:ro
     networks:
       - golum
     restart: unless-stopped
@@ -237,6 +238,7 @@ services:
       - moodle_code:/var/www/html
       - moodledata:/bitnami/moodledata
       - ./certs/ca/golum-local-ca.crt:/usr/local/share/ca-certificates/golum-local-ca.crt:ro
+      - ./docker/moodle/keycloak-icon.svg:/var/www/html/public/local/keycloak/keycloak-icon.svg:ro
     networks:
       - golum
     restart: unless-stopped
