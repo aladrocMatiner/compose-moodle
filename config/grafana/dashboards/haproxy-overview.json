@@ -49,9 +49,9 @@
       "datasource": { "type": "prometheus", "uid": "Prometheus" },
       "targets": [
         {
-          "expr": "rate(haproxy_frontend_http_requests_total[5m])",
+          "expr": "rate(haproxy_frontend_http_requests_total{job=\"haproxy\"}[5m])",
           "refId": "A",
-          "legendFormat": "{{frontend}}"
+          "legendFormat": "{{proxy}}"
         }
       ],
       "fieldConfig": {
@@ -81,14 +81,14 @@
       "datasource": { "type": "prometheus", "uid": "Prometheus" },
       "targets": [
         {
-          "expr": "rate(haproxy_backend_http_responses_total{code=\"4xx\"}[5m])",
+          "expr": "rate(haproxy_backend_http_responses_total{job=\"haproxy\",code=\"4xx\"}[5m])",
           "refId": "A",
-          "legendFormat": "{{backend}} 4xx"
+          "legendFormat": "{{proxy}} 4xx"
         },
         {
-          "expr": "rate(haproxy_backend_http_responses_total{code=\"5xx\"}[5m])",
+          "expr": "rate(haproxy_backend_http_responses_total{job=\"haproxy\",code=\"5xx\"}[5m])",
           "refId": "B",
-          "legendFormat": "{{backend}} 5xx"
+          "legendFormat": "{{proxy}} 5xx"
         }
       ],
       "fieldConfig": {
@@ -118,9 +118,9 @@
       "datasource": { "type": "prometheus", "uid": "Prometheus" },
       "targets": [
         {
-          "expr": "rate(haproxy_backend_http_response_time_seconds_sum[5m]) / rate(haproxy_backend_http_response_time_seconds_count[5m])",
+          "expr": "haproxy_backend_response_time_average_seconds{job=\"haproxy\"}",
           "refId": "A",
-          "legendFormat": "{{backend}}"
+          "legendFormat": "{{proxy}}"
         }
       ],
       "fieldConfig": {
@@ -150,9 +150,9 @@
       "datasource": { "type": "prometheus", "uid": "Prometheus" },
       "targets": [
         {
-          "expr": "haproxy_frontend_current_sessions",
+          "expr": "haproxy_frontend_current_sessions{job=\"haproxy\"}",
           "refId": "A",
-          "legendFormat": "{{frontend}}"
+          "legendFormat": "{{proxy}}"
         }
       ],
       "options": {
@@ -179,4 +179,3 @@
     }
   ]
 }
-
